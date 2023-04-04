@@ -15,7 +15,7 @@ geth --datadir /data/l1_geth \
 
 echo 'starting node...'
 geth --datadir /data/l1_geth \
-    --networkid 10400 \
+    --networkid "10400" \
     --rpc.txfeecap 0 \
     --syncmode full \
     --gcmode archive \

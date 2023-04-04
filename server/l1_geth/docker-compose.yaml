@@ -1,6 +1,44 @@
 version: '3.9'
 
 services:
+
+  l1db:
+    image: postgres
+    restart: always
+    container_name: l1_postgres
+    environment:
+        POSTGRES_PASSWORD: 'postgres'
+        POSTGRES_USER: 'postgres'
+        POSTGRES_HOST_AUTH_METHOD: 'trust'
+    volumes:
+      - l1_postgres_data:/var/lib/postgresql/data
+  
+  l1blockscout:
+    depends_on:
+      - l1db
+    image: blockscout/blockscout:4.1.8
+    restart: always
+    container_name: l1_blockscout
+    command: bash -c "bin/blockscout eval \"Elixir.Explorer.ReleaseTasks.create_and_migrate()\" && bin/blockscout start"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    environment:
+        PORT: '4000'
+        ETHEREUM_JSONRPC_VARIANT: 'geth'
+        ETHEREUM_JSONRPC_HTTP_URL: http://l1_geth:8545
+        ETHEREUM_JSONRPC_WS_URL: ws://l1_geth:8546
+        DATABASE_URL: postgresql://postgres:postgres@l1db:5432/blockscout?ssl=false
+        NETWORK: 'G1G2L1'
+        SUBNETWORK: 'G1G2 L1 Testnet'
+        COIN: ETH
+        ECTO_USE_SSL: 'false'
+        DISABLE_KNOWN_TOKENS: 'false'
+        SHOW_TESTNET_LABEL: 'true'
+        TESTNET_LABEL_TEXT: G1G2-LAB-DEV-L1
+        SUPPORTED_CHAINS: '[]'
+        DISPLAY_TOKEN_ICONS: 'true'
+    ports:
+      - 4001:4000
   l1_geth:
     build:
       context: .
@@ -8,7 +46,7 @@ services:
     restart: unless-stopped
     container_name: l1_geth
     volumes:
-      - data:/data
+      - geth_data:/data
     environment:
       MINER_PRIVATE_KEY: dc4cf1bba6e4f415e5da84faa4d9981120f8cd1c8a5c956480aeae369325a59f
       MINER_ADDRESS: 0x4331e30d6d8201319D80f6FdB063Ca376114F203
@@ -18,5 +56,7 @@ services:
       - "10547:8551"
 
 volumes:
-  data:
+  geth_data:
     name: l1_geth_data
+  l1_postgres_data:
+    name: l1_postgres_data
