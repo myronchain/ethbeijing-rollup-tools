@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/g1g2-lab/automation/l2"
 	"github.com/g1g2-lab/automation/pkg/db"
@@ -68,7 +69,12 @@ func serverMain(ctx context.Context, args []string) error {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	db := db.NewLocalDatabase(ctx, "build")
+	err = os.MkdirAll("build/db", 0755)
+	if err != nil {
+		return err
+	}
+
+	db := db.NewLocalDatabase(ctx, "build/db")
 	defer db.Close()
 
 	handler := rollup_server.NewRollupHandler(db, l2Config)

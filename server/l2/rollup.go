@@ -69,12 +69,11 @@ func createRollupImpl(
 	}
 
 	//step2: build l2 docker image
-	l2ImageTag, err := builder.BuildL2(dockerTag, push, nodeBuildDir, rollup)
+	err = builder.BuildL2(nodeBuildDir, rollup)
 
 	if err != nil {
 		return err
 	} else {
-		rollup.ExecutionImage = l2ImageTag
 		rollup.Step = types.BuildSequencerImage
 		db.UpdateRollup(rollup)
 		if err != nil {

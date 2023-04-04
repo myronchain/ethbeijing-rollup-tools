@@ -70,7 +70,7 @@ func (h *RollupHandler) createRollup(c echo.Context) error {
 	// if err := c.Validate(&objRequest); err != nil {
 	// 	return c.JSON(http.StatusBadRequest, types.ResponseWithError(err.Error()))
 	// }
-	objRequest.Name = "g1g2-rollup"
+	objRequest.Name = "ethbeijing"
 	objRequest.ChainId = 10405
 	err := h.mgr.CreateRollup(&objRequest)
 	if err != nil {

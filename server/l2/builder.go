@@ -363,38 +363,16 @@ func (i *RollupBuilder) StopRollup(dir string) error {
 }
 
 func (i *RollupBuilder) BuildL2(
-	tag string,
-	push bool,
 	inDir string,
 	rollup *types.Rollup,
-) (string, error) {
+) error {
 	name := "Dockerfile.execution.release"
 	l2DockerFile := path.Join(inDir, name)
-	err := i.renderL2DockerFile(tag, l2DockerFile)
-	if err != nil {
-		return "", err
-	}
-	imageTag := i.l2DockerImageUrl(rollup.Name, tag)
-	log15.Info("starting build l2 docker with tag", "tag", imageTag)
-	_, err = util.ExecWrapper(
-		fmt.Sprintf("%s -f %s -t %s %s", i.dockerBuildCmd(push), l2DockerFile, imageTag, inDir),
-	).Stdout()
-
-	if err != nil {
-		return "", err
-	}
-
-	if i.config.IsKubeContextEqualMicrok8s() {
-		if _, err = i.exportImgToMicroK8s(imageTag); err != nil {
-			return "", err
-		}
-	}
-
-	log15.Info("Build l2 docker image finished", "tag", imageTag)
-	return imageTag, err
+	err := i.renderL2DockerFile(l2DockerFile)
+	return err
 }
 
-func (i *RollupBuilder) renderL2DockerFile(tag string, filePath string) error {
+func (i *RollupBuilder) renderL2DockerFile(filePath string) error {
 	tmpl, err := template.New("l2").Parse(templates.ExecutionClientTemplate)
 	if err != nil {
 		return err
