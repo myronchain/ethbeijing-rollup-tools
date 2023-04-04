@@ -1,4 +1,4 @@
-package rollup_server
+package server
 
 import "fmt"
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/g1g2-lab/automation/util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,7 +40,5 @@ func NewL2ConfigFromFile(path string) (*L2Config, error) {
 			return nil, fmt.Errorf("failed to parse config file, %w", err)
 		}
 	}
-	// convert relative path to absolutely path
-	cfg.G1G2Admin.FirebaseConfigFile = util.ToAbsolutePath(cfg.G1G2Admin.FirebaseConfigFile)
 	return cfg, nil
 }

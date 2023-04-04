@@ -9,7 +9,7 @@ import (
 	"github.com/g1g2-lab/automation/l2"
 	"github.com/g1g2-lab/automation/pkg/db"
 	"github.com/g1g2-lab/automation/pkg/http"
-	"github.com/g1g2-lab/automation/rollup_server"
+	"github.com/g1g2-lab/automation/server"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -36,14 +36,10 @@ var (
 )
 
 var (
-	serverFlagSet      = flag.NewFlagSet("g1g2 rollup server", flag.ExitOnError)
-	portFlag           = serverFlagSet.Int("port", 8082, "server listen port")
-	serverRepoFlag     = serverFlagSet.String("repo", "repo.yaml", "g1g2 repo configuration file")
-	enablerollupCreate = serverFlagSet.Bool("create-loop", false, "")
-	enablerollupRun    = serverFlagSet.Bool("run-loop", false, "")
-	enablerollupStatus = serverFlagSet.Bool("status-loop", false, "")
-	serverConfigFlag   = serverFlagSet.String("config", "rollup_server_prod.yaml", "g1g2 configuration file")
-	serverCommand      = &ffcli.Command{
+	serverFlagSet    = flag.NewFlagSet("g1g2 rollup server", flag.ExitOnError)
+	portFlag         = serverFlagSet.Int("port", 8082, "server listen port")
+	serverConfigFlag = serverFlagSet.String("config", "rollup_server_prod.yaml", "g1g2 configuration file")
+	serverCommand    = &ffcli.Command{
 		Name:       "server",
 		ShortUsage: "g1g2 rollup server",
 		ShortHelp:  "run a g1g2 rollup by http request",
@@ -77,7 +73,7 @@ func serverMain(ctx context.Context, args []string) error {
 	db := db.NewLocalDatabase(ctx, "build/db")
 	defer db.Close()
 
-	handler := rollup_server.NewRollupHandler(db, l2Config)
+	handler := server.NewRollupHandler(db, l2Config)
 	handler.SetupRollupRouter(e, db)
 
 	// Start server
