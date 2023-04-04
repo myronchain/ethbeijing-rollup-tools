@@ -31,7 +31,7 @@ func (f *LocalFileDatabase) Close() error {
 }
 
 func (f *LocalFileDatabase) rollupRootDir() string {
-	return path.Join(f.dbRootDir, "rollups")
+	return f.dbRootDir
 }
 
 func (f *LocalFileDatabase) rollupPath(rid string) string {
