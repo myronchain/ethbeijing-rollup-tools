@@ -63,13 +63,15 @@ func (h *RollupHandler) getRollups(c echo.Context) error {
 
 func (h *RollupHandler) createRollup(c echo.Context) error {
 	var objRequest types.CreateRollupRequest
-	if err := c.Bind(&objRequest); err != nil {
-		log15.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, types.ResponseWithError(err.Error()))
-	}
-	if err := c.Validate(&objRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, types.ResponseWithError(err.Error()))
-	}
+	// if err := c.Bind(&objRequest); err != nil {
+	// 	log15.Error(err.Error())
+	// 	return c.JSON(http.StatusBadRequest, types.ResponseWithError(err.Error()))
+	// }
+	// if err := c.Validate(&objRequest); err != nil {
+	// 	return c.JSON(http.StatusBadRequest, types.ResponseWithError(err.Error()))
+	// }
+	objRequest.Name = "g1g2-rollup"
+	objRequest.ChainId = 10405
 	err := h.mgr.CreateRollup(&objRequest)
 	if err != nil {
 		return c.JSON(http.StatusNotAcceptable, types.ResponseWithError(err.Error()))
