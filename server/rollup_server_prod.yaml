@@ -1,17 +1,12 @@
-# docker image version for all rollup
 docker_image:
   execution_base: 1.0.6-g1g2
   consensus_base: 1.0.7-g1g2
 
 # g1g2 admin config for all rollup
 g1g2_admin:
-  l1_admin_pk: "f6be87d3906e7408d4c7ff43086137f058b420fb7a8ddad8afae14c87087e635"
-  rollup_admin_l2_premint_wei: 1000000000000000000 # 1 eth charge rollup admin address in l2
+  l1_admin_pk: "dc4cf1bba6e4f415e5da84faa4d9981120f8cd1c8a5c956480aeae369325a59f"
+  rollup_admin_l2_premint_wei: 1000000000000000000000
   github_private_key_path: id_ed25519_for_github
-  firebase_config_file: firebase_config.json
 
 node:
   base_port: 11545
-  replicas: 1
-
-kubectl_context: gke
