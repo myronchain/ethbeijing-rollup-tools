@@ -7,6 +7,22 @@ import (
 	"time"
 )
 
+// deploy step
+const (
+	// deploy step
+	RollupInit          = 0
+	RollupDeployOnL1    = 1
+	BuildExecutionImage = 2
+	BuildSequencerImage = 3
+	WaitItOnline        = 4
+	Online              = 5
+)
+
+type L2FundWallets struct {
+	WalletAddress string `firestore:"WalletAddress,omitempty" yaml:"WalletAddress"`
+	AmountInWei   string `firestore:"AmountInWei,omitempty" yaml:"AmountInWei"`
+}
+
 type CreateRollupRequest struct {
 	Name          string          `json:"name" validate:"required"`
 	ChainId       int             `json:"chain_id" validate:"required"`
