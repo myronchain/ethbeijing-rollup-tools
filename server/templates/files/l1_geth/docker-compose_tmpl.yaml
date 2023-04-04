@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  l1_geth:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    container_name: l1_geth
+    volumes:
+      - data:/data
+    environment:
+      MINER_PRIVATE_KEY: {{.L1MinerPriv}}
+      MINER_ADDRESS: {{.L1MinerAddress}}
+      CHAIN_ID: {{.L1ChainId}}
+    ports:
+      - "{{.L1HttpPort}}:8545"
+      - "{{.L1WsPort}}:8546"
+      - "{{.L1AuthRpcPort}}:8551"
+
+volumes:
+  data:
+    name: l1_geth_data

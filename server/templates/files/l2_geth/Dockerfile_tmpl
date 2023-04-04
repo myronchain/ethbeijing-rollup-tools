@@ -1,0 +1,26 @@
+# Build Geth in a stock Go builder container
+FROM golang:1.18-alpine as builder
+
+RUN apk add --no-cache gcc musl-dev linux-headers git
+
+# Get dependencies - will also be cached if we won't change go.mod/go.sum
+COPY go.mod /go-ethereum/
+COPY go.sum /go-ethereum/
+WORKDIR /go-ethereum
+RUN go mod download
+
+COPY . /go-ethereum
+WORKDIR /go-ethereum
+RUN go run build/ci.go install ./cmd/geth
+
+
+FROM alpine:latest
+
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /go-ethereum/build/bin/geth /usr/local/bin/
+
+EXPOSE 8545 8546 8551 30303 30303/udp
+
+COPY {{.DeploymentChainNameDir}}/init_l2_geth.sh /init_l2_geth.sh
+COPY {{.DeploymentChainNameDir}}/l2_genesis.json /l2_genesis.json
+ENTRYPOINT ["/init_l2_geth.sh"]

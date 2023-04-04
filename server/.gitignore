@@ -1,0 +1,5 @@
+build
+.idea/
+service-account.json
+firebase_config.json
+g1g2-bootnode.key

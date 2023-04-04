@@ -1,0 +1,51 @@
+#FROM us-central1-docker.pkg.dev/g1g2-db990/common/consensus-base:2023-01-17 as builder
+FROM g1g2/g1g2-base:2023-02-08 as builder
+
+ENV CARGO_TARGET_DIR=/target
+ENV CARGO_HOME=/usr/local/cargo
+ENV PATH=$CARGO_HOME/bin:$PATH
+
+RUN printf "\
+[source.crates-io] \n\
+replace-with = 'tuna' \n\
+[source.tuna] \n\
+registry = 'https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git' \n\
+" >> /usr/local/cargo/config
+
+WORKDIR /src
+COPY rust-toolchain .
+RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+ARG SSH_PRIVATE_KEY
+RUN mkdir -p /root/.ssh/  && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts && \
+    echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa
+
+COPY . .
+RUN  \
+     --mount=type=cache,target=/usr/local/cargo/registry \
+     --mount=type=cache,target=/target \
+     eval `ssh-agent -s` && \
+     ssh-add ~/.ssh/id_rsa && \
+     cargo \
+     --locked \
+     build \
+     --bin main --package consensus --release --target-dir /target  && \
+      mv /target/release/main /
+      # && rm -rf /target
+
+# Remove SSH keys
+RUN rm -rf /root/.ssh/
+
+#FROM alpine@sha256:686d8c9dfa6f3ccfc8230bc3178d23f84eeaf7e457f36f271ab1acc53015037c
+FROM debian:bookworm-slim
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        libpq-dev \
+        libssl-dev
+COPY --from=builder /main /
+ENTRYPOINT ["/main"]

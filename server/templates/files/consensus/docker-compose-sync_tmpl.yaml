@@ -1,0 +1,40 @@
+version: '3.9'
+
+networks:
+  default:
+    name: g1g2-sync-network
+
+services:
+{{range $val := .Instances}}
+  {{$val.ServiceName}}:
+    init: true
+    build:
+      context: ../..
+      dockerfile: {{$.DeploymentChainNameDir}}/Dockerfile
+      args:
+        SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+    container_name: {{$val.ServiceName}}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./jwtSecret:/jwtSecret
+    environment:
+      # sync
+      - L2_ENGINE_API_RPC_URL={{$val.L2EngineApiUrl}}
+      - L2_JWT_SECRET=/jwtSecret
+      # common
+      - L1_RPC_URL={{$val.Common.L1RpcUrl}}
+      - L1_WS_URL={{$val.Common.L1WsUrl}}
+      - L2_RPC_URL={{$val.Common.L2RpcUrl}}
+      - L2_WS_URL={{$val.Common.L2WsUrl}}
+      - L1_ROLLUP={{$.L1Rollup}}
+      - L2_ROLLUP={{$.L2Rollup}}
+      - L2_CHAIN_ID={{$.ChainId}}
+      # p2p sync
+      - ENABLE_P2P_SYNC_ONCHAIN_BLOCKS=true
+      - P2P_SYNC_TIMEOUT_SECONDS=90
+      - ONLY_SYNC_BLOCKS_BY_P2P=false
+    tty: true
+    command:
+      - --enable-sync
+{{end}}

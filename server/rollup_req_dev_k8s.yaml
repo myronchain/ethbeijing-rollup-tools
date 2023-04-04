@@ -1,0 +1,19 @@
+# rollup request config file
+
+Name: g1g2-localdev
+ChainId: 1000001
+L1: G1G2Dev
+L2FundWallets:
+  - WalletAddress: 0xB3C2F2c68003549EACC49650B446005157105545
+    AmountInWei: 10000
+  - WalletAddress: 0x65047fbb4be8fC1DE7dB83A7EfA3865d10952411
+    AmountInWei: 10000
+  - WalletAddress: 0x7b5F68E2FD5bc17D74a2D94d632943F9998D6363
+    AmountInWei: 10000
+BridgeEnabled: true
+Uid: localdev-user-id
+Components:
+  - Target: 1
+  - Target: 1
+  - Target: 1
+

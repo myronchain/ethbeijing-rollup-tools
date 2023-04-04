@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+{{range $val := .Instances}}
+  {{$val.ServiceName}}:
+    build:
+      # repo root
+      context: ../..
+      dockerfile: {{$.DeploymentChainNameDir}}/Dockerfile
+    # restart: unless-stopped
+    container_name: {{$val.ServiceName}}
+    environment:
+      - BOOTNODE_ADDRESS=enode://{{$.BootnodeAddress}}@bootnode:30301
+    volumes:
+      - data-{{$val.ServiceName}}:/data
+      - ./jwtSecret:/data/{{$.ChainName}}/l2_geth/geth/jwtsecret
+    ports:
+      - {{$val.L2HttpPort}}:8545
+      - {{$val.L2WsPort}}:8546
+      - {{$val.L2AuthRpcPort}}:8551
+{{end}}
+
+  # l2-geth-bootnode:
+  #   build:
+  #     context: ../..
+  #     dockerfile: "{{$.DeploymentChainNameDir}}/Dockerfile"
+  #   container_name: l2-geth-bootnode
+  #   volumes:
+  #     - data-bootnode:/data
+  #     - ./init_l2_bootnode.sh:/init_l2_bootnode.sh
+  #   environment:
+  #     - BOOTNODE_KEY={{.BootnodeKeyHex}}
+  #   entrypoint: /init_l2_bootnode.sh
+  bootnode:
+    image: ethereum/client-go:alltools-latest
+    container_name: bootnode
+    command:
+      - "bootnode"
+      - "-nodekeyhex"
+      - "{{.BootnodeKeyHex}}"
+      - "-addr"
+      - ":30301"
+      - "-verbosity"
+      - "5"
+
+
+volumes:
+{{- range $val := .Instances}}
+  data-{{$val.ServiceName}}:
+    name: {{$val.ServiceName}}_node_data
+{{- end}}
+  data-bootnode:
+    name: data-bootnode-data

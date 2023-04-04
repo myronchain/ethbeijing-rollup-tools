@@ -1,0 +1,35 @@
+FROM g1g2/g1g2-consensus-client:{{.ConsensusBaseVersion}}
+
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=info
+# propose
+ENV PROPOSER_PRIV={{.ProposerPriv}}
+ENV PROPOSE_BENEFICIARY_ADDRESS={{.ProposeBeneficiary}}
+# sync
+ENV L2_ENGINE_API_RPC_URL={{.L2EngineApiUrl}}
+ENV L2_JWT_SECRET=
+# prover
+ENV PROVER_PRIV={{.ProverPriv}}
+# relay
+ENV RELAY_L1_PRIV={{.RelayL1Priv}}
+ENV RELAY_L2_PRIV={{.RelayL2Priv}}
+ENV L1_BRIDGE={{.L1Bridge}}
+ENV L2_BRIDGE={{.L2Bridge}}
+ENV DB_URL={{.RelayDbUrl}}
+# common
+ENV L1_RPC_URL={{.L1RpcUrl}}
+ENV L1_WS_URL={{.L1WsUrl}}
+ENV L2_RPC_URL={{.L2RpcUrl}}
+ENV L2_WS_URL={{.L2WsUrl}}
+ENV L1_ROLLUP={{.L1Rollup}}
+ENV L2_ROLLUP={{.L2Rollup}}
+ENV L2_CHAIN_ID={{.ChainId}}
+# misc
+ENV PROVER_RPCD_URL=http://prover-rpcd:8545
+ENV PARAMS_PATH=
+ENV CIRCUIT_NAME=dummy
+ENV DUMMY_PROVER=true
+ENV L2_NODE_CANDIDATES=
+ENV LISTEN=0.0.0.0:9876
+
+ENTRYPOINT ["/main"]
