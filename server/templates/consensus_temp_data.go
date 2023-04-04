@@ -1,30 +1,7 @@
 package templates
 
-type SyncTempData struct {
-	Instances              []SyncInstance
-	ChainId                int
-	ChainName              string
-	DeploymentChainNameDir string
-	L1Rollup               string
-	L2Rollup               string
-}
-
-type SyncInstance struct {
-	Common         ConsensusCommonTempData
-	L2EngineApiUrl string
-	ServiceName    string
-}
-
-type ConsensusCommonTempData struct {
-	L1RpcUrl string
-	L1WsUrl  string
-	L2RpcUrl string
-	L2WsUrl  string
-}
-
 type ConsensusTempData struct {
-	ChainName string
-
+	ChainName            string
 	L1ContractDeployerPk string
 	RollupStartupPriv    string
 

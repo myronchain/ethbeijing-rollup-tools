@@ -44,9 +44,6 @@ func createRollupImpl(
 	db *db.LocalFileDatabase,
 	config *L2Config,
 ) error {
-	dockerTag := defaultDockerImageTag()
-	push := true
-
 	// render node templates
 	nodeBuildDir := path.Join(util.ToAbsolutePath(BuildDir), rollup.Name, "l2_geth")
 	err := os.MkdirAll(nodeBuildDir, 0755)
@@ -92,24 +89,13 @@ func createRollupImpl(
 		return err
 	}
 
-	consensusImage, err := builder.BuildConsensus(dockerTag, push, db, consensusBuildDir, rollup)
+	// step4: render docker compose
+	dockerDir := path.Join(util.ToAbsolutePath(BuildDir), rollup.Name)
+	err = builder.RenderRollupTemplates(rollup, dockerDir)
 	if err != nil {
 		return err
-	} else {
-		rollup.ConsensusImage = consensusImage
-		rollup.CreatedAt = time.Now()
-		rollup.Step = types.WaitItOnline
-		err := db.UpdateRollup(rollup)
-		if err != nil {
-			return err
-		}
 	}
 	return nil
-}
-
-func defaultDockerImageTag() string {
-	now := time.Now()
-	return now.Format("2006-01-02-15-04")
 }
 
 func RunRollup(

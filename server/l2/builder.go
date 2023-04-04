@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"strconv"
 	"text/template"
 
 	"github.com/g1g2-lab/automation/pkg/db"
@@ -15,8 +14,6 @@ import (
 	"github.com/g1g2-lab/automation/util"
 	"github.com/inconshreveable/log15"
 )
-
-type pathFunc func(string) string
 
 var (
 	// defined hardhat.config.js
@@ -182,38 +179,23 @@ func (i *RollupBuilder) RenderNodeTemplates(
 	toDirPath string,
 ) error {
 	util.PrintStepLogo("RENDER NODE TEMPLATES")
-	dockerFileTmpl := path.Join(TemplateFilesDir, "l2_geth/Dockerfile_tmpl")
-	dockerDevFileTmpl := path.Join(TemplateFilesDir, "l2_geth/Dockerfile_dev_tmpl")
 	initTmpl := path.Join(TemplateFilesDir, "l2_geth/init_l2_geth_tmpl.sh")
-	dockerComposeTmpl := path.Join(TemplateFilesDir, "l2_geth/docker-compose_tmpl.yaml")
-	bootnodeTmpl := path.Join(TemplateFilesDir, "l2_geth/init_l2_bootnode_tmpl.sh")
-	instances := []templates.L2InstanceTemplateData{}
-	basePort := i.config.NodeConfig.BasePort
-
-	for index := 0; index < i.config.NodeConfig.Replicas; index++ {
-		d := templates.L2InstanceTemplateData{
-			ServiceName:   rollup.Name + "-" + strconv.Itoa(index) + "-node",
-			L2HttpPort:    basePort + index*3,
-			L2WsPort:      basePort + index*3 + 1,
-			L2AuthRpcPort: basePort + index*3 + 2,
-		}
-		instances = append(instances, d)
-	}
-
 	data := templates.L2NodeTemplateData{
-		ChainId:                rollup.ChainId,
-		ChainName:              rollup.Name,
-		DeploymentChainNameDir: path.Join(DeploymentsDirName, rollup.Name),
-		Instances:              instances,
-		BootnodeKeyHex:         BootNodeKeyHexForDev,
-		BootnodeAddress:        BootNodeKeyAddressForDev,
+		ChainId:   rollup.ChainId,
+		ChainName: rollup.Name,
 	}
-
-	templates.Render(dockerFileTmpl, toDirPath, data)
-	templates.Render(dockerDevFileTmpl, toDirPath, data)
 	templates.Render(initTmpl, toDirPath, data)
-	templates.Render(dockerComposeTmpl, toDirPath, data)
-	templates.Render(bootnodeTmpl, toDirPath, data)
+	return nil
+}
+
+func (i *RollupBuilder) RenderRollupTemplates(
+	rollup *types.Rollup,
+	toDirPath string,
+) error {
+	util.PrintStepLogo("RENDER ROLLUP TEMPLATES")
+	dockerTmpl := path.Join(TemplateFilesDir, "rollup/docker-compose_tmpl.yaml")
+	consensusData := i.GenConsensusTemplateData(rollup)
+	templates.Render(dockerTmpl, toDirPath, consensusData)
 	return nil
 }
 
@@ -222,27 +204,10 @@ func (i *RollupBuilder) RenderConsensusTemplates(
 	toDirPath string,
 ) error {
 	util.PrintStepLogo("RENDER CONSENSUS TEMPLATES")
-	dockerFileTmpl := path.Join(TemplateFilesDir, "consensus/Dockerfile_tmpl")
 	prodDockerfileTmpl := path.Join(TemplateFilesDir, "consensus/Dockerfile_prod_tmpl")
-	dockerComposeTmpl := path.Join(TemplateFilesDir, "consensus/docker-compose_tmpl.yaml")
-	syncComposeTmpl := path.Join(TemplateFilesDir, "consensus/docker-compose-sync_tmpl.yaml")
-	runTestTmpl := path.Join(TemplateFilesDir, "consensus/run_consensus_test_tmpl.sh")
-	runConsensusTmpl := path.Join(TemplateFilesDir, "consensus/run_consensus_tmpl.sh")
-
-	syncData, err := i.GenSyncTemplateData(rollup)
-	if err != nil {
-		return err
-	}
 
 	consensusData := i.GenConsensusTemplateData(rollup)
-	// sync
-	templates.Render(syncComposeTmpl, toDirPath, syncData)
-	// TODO (eric) seperate propose/prove/relay
-	templates.Render(dockerFileTmpl, toDirPath, consensusData)
 	templates.Render(prodDockerfileTmpl, toDirPath, consensusData)
-	templates.Render(dockerComposeTmpl, toDirPath, consensusData)
-	templates.Render(runTestTmpl, toDirPath, consensusData)
-	templates.Render(runConsensusTmpl, toDirPath, consensusData)
 
 	return nil
 }
@@ -287,42 +252,6 @@ func (i *RollupBuilder) GenConsensusTemplateData(
 	}
 }
 
-func (i *RollupBuilder) GenSyncTemplateData(
-	rollup *types.Rollup,
-) (*templates.SyncTempData, error) {
-	instances := []templates.SyncInstance{}
-	basePort := i.config.NodeConfig.BasePort
-
-	l1 := rollup.L1
-	for index := 0; index < i.config.NodeConfig.Replicas; index++ {
-
-		l2Rpc := fmt.Sprintf(HttpHostnameInDockerPattern, basePort+index*3)
-		l2Ws := fmt.Sprintf(WsHostnameInDockerPattern, basePort+index*3+1)
-		l2Auth := fmt.Sprintf(HttpHostnameInDockerPattern, basePort+index*3+2)
-
-		d := templates.SyncInstance{
-			ServiceName:    "sync-" + strconv.Itoa(index),
-			L2EngineApiUrl: l2Auth,
-			Common: templates.ConsensusCommonTempData{
-				L1RpcUrl: l1.InternalRpcUrl,
-				L1WsUrl:  l1.InternalWsUrl,
-				L2RpcUrl: l2Rpc,
-				L2WsUrl:  l2Ws,
-			},
-		}
-		instances = append(instances, d)
-	}
-	data := &templates.SyncTempData{
-		ChainId:                rollup.ChainId,
-		ChainName:              rollup.Name,
-		DeploymentChainNameDir: path.Join(DeploymentsDirName, rollup.Name),
-		Instances:              instances,
-		L1Rollup:               rollup.L1Rollup,
-		L2Rollup:               rollup.L2Rollup,
-	}
-	return data, nil
-}
-
 func (i *RollupBuilder) RunRollup(build bool, dir string) error {
 	util.PrintStepLogo("RUN L2 NODE")
 	os.Setenv("DOCKER_BUILDKIT", "1")
@@ -353,7 +282,7 @@ func (i *RollupBuilder) StopRollup(dir string) error {
 	curr, _ := os.Getwd()
 	os.Chdir(dir)
 
-	_, err := util.ExecWrapper(fmt.Sprintf("docker compose down -v")).Stdout()
+	_, err := util.ExecWrapper("docker compose down -v").Stdout()
 	if err != nil {
 		log15.Info("G1G2", "error", err)
 		return err
@@ -386,79 +315,4 @@ func (i *RollupBuilder) renderL2DockerFile(filePath string) error {
 		"Version": i.config.DockerImageConfig.ExecutionBase,
 	})
 	return err
-}
-
-func (i *RollupBuilder) dockerBuildCmd(push bool) string {
-	arg := ""
-
-	if i.config.IsKubeContextEqualMicrok8s() {
-		return "docker buildx build --builder RollupBuilder --load"
-		//return "docker buildx build --load"
-	} else {
-		if push {
-			arg = "--push"
-		}
-		return fmt.Sprintf("docker buildx build --builder RollupBuilder --output=type=registry,registry.insecure=false --platform linux/amd64,linux/arm64 %s", arg)
-	}
-}
-
-func (i *RollupBuilder) BuildConsensus(
-	tag string,
-	push bool,
-	db *db.LocalFileDatabase,
-	inDir string,
-	rollup *types.Rollup,
-) (string, error) {
-	consensusDockerFile := path.Join(inDir, "Dockerfile_prod")
-	imageTag := i.consensusDockerImageUrl(rollup.Name, tag)
-	log15.Info("starting build consensus docker image with", "tag", imageTag)
-	_, err := util.ExecWrapper(
-		fmt.Sprintf("%s -f %s -t %s %s", i.dockerBuildCmd(push), consensusDockerFile, imageTag, inDir),
-	).Stdout()
-
-	if err != nil {
-		return "", err
-	}
-	if i.config.IsKubeContextEqualMicrok8s() {
-		if _, err = i.exportImgToMicroK8s(imageTag); err != nil {
-			return "", err
-		}
-	}
-	return imageTag, err
-}
-
-func (i *RollupBuilder) InitGcloudWithCredientialFile(fileName string) error {
-	_, err := util.ExecWrapper(
-		fmt.Sprintf("gcloud auth activate-service-account --key-file %s", fileName)).Stdout()
-	return err
-}
-
-func (i *RollupBuilder) l2DockerImageUrl(chainName, tag string) string {
-	return i.toDockerImageUrl("execution-client", chainName, tag)
-}
-
-func (i *RollupBuilder) consensusDockerImageUrl(chainName, tag string) string {
-	return i.toDockerImageUrl("consensus-client", chainName, tag)
-}
-
-func (i *RollupBuilder) toDockerImageUrl(name, chainName, tag string) string {
-	// currently we use gcp g1g2-db990/common repository
-	repoUrl := "common"
-	return fmt.Sprintf("%s/%s:%s-%s", repoUrl, name, chainName, tag)
-}
-
-func (i *RollupBuilder) exportImgToMicroK8s(imageTag string) (string, error) {
-	_, err := util.ExecWrapper("docker save " + imageTag + " -o tmp.tar").Stdout()
-	if err != nil {
-		return "", err
-	}
-	_, err = util.ExecWrapper("microk8s ctr image import tmp.tar").Stdout()
-	if err != nil {
-		return "", err
-	}
-	_, err = util.ExecWrapper("rm -rf tmp.tar").Stdout()
-	if err != nil {
-		return "", err
-	}
-	return "", nil
 }

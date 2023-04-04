@@ -28,4 +28,3 @@ geth --datadir /data/{{.ChainName}}/l2_geth \
     --authrpc.vhosts '*' \
     --allow-insecure-unlock \
     --verbosity 3 \
-    --bootnodes "$BOOTNODE_ADDRESS"

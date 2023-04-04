@@ -1,26 +1,27 @@
 version: '3.9'
 
-networks:
-  default:
-    name: g1g2-chain
-
 services:
-  # todo: should list relaydb as dependency
-  consensus:
-    init: true
+  l2_node:
     build:
-      context: ../..
-      dockerfile: {{.DeploymentChainNameDir}}/Dockerfile
-      #    image: ghcr.io/g1g2.xyz/consensus:latest
-      #    restart: unless-stopped
-      args:
-        SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
-    #    image: ghcr.io/g1g2.xyz/dev:latest
-    container_name: {{.ChainName}}_consensus
+      context: l2_geth
+      dockerfile: l2_geth/Dockerfile
+    container_name: "{{.ChainName}}_node"
+    volumes:
+      - data:/data
+    ports:
+      - {{.L2HttpPort}}:8545
+      - {{.L2WsPort}}:8546
+      - {{.L2AuthRpcPort}}:8551
+
+  consensus:
+    build:
+      context: consensus
+      dockerfile: consensus/Dockerfile
+    container_name: "{{.ChainName}}_consensus"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./jwtSecret:/jwtSecret
+      - data:/data
     environment:
       - LISTEN=0.0.0.0:9876
       # propose
@@ -55,35 +56,12 @@ services:
       - ENABLE_P2P_SYNC_ONCHAIN_BLOCKS=true
       - P2P_SYNC_TIMEOUT_SECONDS=90
       - ONLY_SYNC_BLOCKS_BY_P2P=false
-
-    tty: true
     command:
       - --enable-propose
       - --enable-prove
       - --enable-relay
-      # - --save-chain-status
-
-  consensus_dev:
-    profiles:
-      - dev
-#    build:
-#      context: ../..
-#      dockerfile: {{.DeploymentChainNameDir}}/Dockerfile_dev
-    image: g1g2/g1g2-dev:2023-02-03
-    container_name: {{.ChainName}}_consensus_dev
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - ../..:/g1g2-consensus
-      - ./jwtSecret:/jwtSecret
-      - dev-build-cache:/target:overlay
-      - ~/.ssh:/root/.ssh
-      - ~/.config/gcloud:/root/.config/gcloud
-    working_dir: /g1g2-consensus
-    entrypoint: /sbin/getty
-    command: '-'
-    tty: true
-    init: true
+      - --enable-sync
 
 volumes:
-  dev-build-cache:
+  data:
+    name: {{.ChainName}}_node_data
