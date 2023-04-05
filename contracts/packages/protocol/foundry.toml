@@ -1,0 +1,10 @@
+[profile.default]
+src = 'contracts'
+out = 'artifacts/forge'
+libs = ['node_modules']
+test = 'test/forge-tests'
+cache_path = 'cache/forge'
+
+remappings = [
+  'ds-test/=node_modules/ds-test/src/'
+]

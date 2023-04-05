@@ -1,0 +1,42 @@
+name: Solidity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/protocol/**"
+
+  pull_request:
+    paths:
+      - "packages/protocol/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16.15"
+
+      - name: prepare env - Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: prepare env - Install Yarn Package
+        working-directory: ./packages/protocol
+        run: yarn
+
+      - name: protocol test - Hardhat
+        working-directory: ./packages/protocol
+        run: yarn clean && yarn run test
+
+      - name: protocol test - Foundry
+        working-directory: ./packages/protocol
+        run: yarn clean && yarn run test:forge
