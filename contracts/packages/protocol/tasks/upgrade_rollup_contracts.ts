@@ -15,8 +15,6 @@ task("upgrade_rollup_contracts", "upgrade l1 and l2 rollup contracts")
   .addParam("l1DeployerPrivateKey", "l1 contract deployer private key", undefined, types.string)
   // --l2-deployer-private-key <l2DeployPrivateKey>
   .addParam("l2DeployerPrivateKey", "l2 contract deployer private key", undefined, types.string)
-  // --firebase-config <firebaseConfig>
-  .addParam("firebaseConfig", "firebase config json", undefined, types.json)
   // --download-artifacts <downloadArtifacts>
   .addOptionalParam("downloadArtifacts", "whether download artifacts or compile source code", undefined, types.boolean)
   .setAction(async function (args: any, hre: HardhatRuntimeEnvironment) {
@@ -27,7 +25,7 @@ task("upgrade_rollup_contracts", "upgrade l1 and l2 rollup contracts")
     const l2ChainId: number = await getChainIdByRpcUrl(l2RpcUrl);
     const rollupVersion: number = args.rollupVersion;
 
-    const db = getDbInstance(args.firebaseConfig);
+    const db = getDbInstance();
     const rollupContracts = await db.getRollupContracts(l1ChainId, l2ChainId);
     if (!rollupContracts) {
       throw new Error("rollup contracts not deployed yet!");
@@ -48,7 +46,6 @@ task("upgrade_rollup_contracts", "upgrade l1 and l2 rollup contracts")
       + ` --l1-chain-id ${l1ChainId}`
       + ` --l2-chain-id ${l2ChainId}`
       + ` --rollup-version ${rollupVersion}`
-      + ` --firebase-config '${JSON.stringify(args.firebaseConfig)}'`;
     shellExec(upgradeL1Cmd);
 
     console.log('upgrade l2 contracts...');
@@ -56,7 +53,6 @@ task("upgrade_rollup_contracts", "upgrade l1 and l2 rollup contracts")
       + ` --l1-chain-id ${l1ChainId}`
       + ` --l2-chain-id ${l2ChainId}`
       + ` --rollup-version ${rollupVersion}`
-      + ` --firebase-config '${JSON.stringify(args.firebaseConfig)}'`;
     shellExec(upgradeL2Cmd);
 
     await db.updateRollupVersion(l1ChainId, l2ChainId, rollupVersion);

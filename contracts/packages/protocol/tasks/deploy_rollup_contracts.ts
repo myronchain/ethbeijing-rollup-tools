@@ -15,8 +15,6 @@ task("deploy_rollup_contracts", "deploy l1 rollup contracts and generate l2 gene
   .addParam("l1DeployerPrivateKey", "l1 contract deployer private key", undefined, types.string)
   // --l2-deployer-address <l2DeployerAddress>
   .addParam("l2DeployerAddress", "l2 contract deployer address", undefined, types.string)
-  // --firebase-config <firebaseConfig>
-  .addParam("firebaseConfig", "firebase config json", undefined, types.json)
   // --l2-premint-accounts <l2PremintAccounts>
   .addOptionalParam("l2PremintAccounts", "l2 premint accounts json", undefined, types.json)
   // --download-artifacts <downloadArtifacts>
@@ -25,7 +23,7 @@ task("deploy_rollup_contracts", "deploy l1 rollup contracts and generate l2 gene
     await writeDotEnv(args);
     const l1RpcUrl: string = args.l1RpcUrl;
     const l1ChainId: number = await getChainIdByRpcUrl(l1RpcUrl);
-    const db = getDbInstance(args.firebaseConfig);
+    const db = getDbInstance();
     const rollupContracts = await db.getRollupContracts(l1ChainId, args.l2ChainId);
     if (rollupContracts) {
       console.log(`rollupContracts.Version: ${rollupContracts.Version}, args.rollupVersion: ${args.rollupVersion}`);
@@ -51,7 +49,6 @@ task("deploy_rollup_contracts", "deploy l1 rollup contracts and generate l2 gene
       + ` --l2-chain-id ${args.l2ChainId}`
       + ` --rollup-version ${args.rollupVersion}`
       + ` --l2-deployer-address ${args.l2DeployerAddress}`
-      + ` --firebase-config '${JSON.stringify(args.firebaseConfig)}'`
     if (args.l2PremintAccounts) {
       cmd += ` --l2-premint-accounts '${JSON.stringify(args.l2PremintAccounts)}'`;
     }

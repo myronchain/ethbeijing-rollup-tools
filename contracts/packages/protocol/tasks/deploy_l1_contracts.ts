@@ -12,12 +12,10 @@ task('deploy_l1', 'deploy l1 contracts')
   .addParam("rollupVersion", "rollup version", undefined, types.int)
   // --l2-deployer-address <l2DeployerAddress>
   .addParam("l2DeployerAddress", "l2 contract deployer address", undefined, types.string)
-  // --firebase-config <firebaseConfig>
-  .addParam("firebaseConfig", "firebase config json", undefined, types.json)
   // --l2-premint-accounts <l2PremintAccounts>
   .addOptionalParam("l2PremintAccounts", "l2 premint accounts", undefined, types.json)
   .setAction(async function (args: any, hre: HardhatRuntimeEnvironment) {
-    const db = getDbInstance(args.firebaseConfig);
+    const db = getDbInstance();
     const newVersionedLogics = await db.getL1VersionedLogics(args.l1ChainId, args.rollupVersion);
     if (!newVersionedLogics) {
       console.log(`l1 logic contracts of version ${args.rollupVersion} not exist, try deploying logics...`);

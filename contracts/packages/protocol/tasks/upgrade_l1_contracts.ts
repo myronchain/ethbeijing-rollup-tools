@@ -10,10 +10,8 @@ task('upgrade_l1', 'deploy l1 contracts')
   .addParam("l2ChainId", "l2 chain id", undefined, types.int)
   // --rollup-version <rollupVersion>
   .addParam("rollupVersion", "rollup version", undefined, types.int)
-  // --firebase-config <firebaseConfig>
-  .addParam("firebaseConfig", "firebase config json", undefined, types.json)
   .setAction(async function (args: any, hre: HardhatRuntimeEnvironment) {
-    const db = getDbInstance(args.firebaseConfig);
+    const db = getDbInstance();
     const curRollupContracts = await db.getRollupContracts(args.l1ChainId, args.l2ChainId);
     const curVersion = curRollupContracts.Version;
     const version = args.rollupVersion;

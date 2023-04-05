@@ -9,6 +9,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DB, FirebaseConfig, L1Proxies, L1VersionedLogics, L2VersionedLogics } from "../deploy_db/deploy_types";
 import { generateL2Genesis } from "./generate_l2_genesis";
 import * as path from "path";
+import LocalDB from "../deploy_db/local_db";
 
 async function deployContract(
   hre: HardhatRuntimeEnvironment,
@@ -66,8 +67,8 @@ async function calculateGenesisHash(genesis: Genesis): Promise<string> {
   return genesisHash;
 }
 
-function getDbInstance(firebaseConfig: FirebaseConfig): DB {
-  return new FirestoreDB(firebaseConfig);
+function getDbInstance(): DB {
+  return new LocalDB();
 }
 
 function shellExec(cmd: string, silent = false): string {

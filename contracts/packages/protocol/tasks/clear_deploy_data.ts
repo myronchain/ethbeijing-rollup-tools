@@ -6,8 +6,6 @@ import * as types from "hardhat/internal/core/params/argumentTypes";
 task("clear_deploy_data", "clear deploy data")
   // --clear-type <l1|l2|all>
   .addParam("clearType", "clear type: l1|l2|all", undefined, types.string, false)
-  // --firebase-config <firebaseConfig>
-  .addParam("firebaseConfig", "firebase config json", undefined, types.json)
   // --l1-chain-id <l1ChainId>
   .addOptionalParam("l1ChainId", "l1 chain id", undefined, types.int)
   // --l2-chain-id <l2ChainId>
@@ -15,7 +13,7 @@ task("clear_deploy_data", "clear deploy data")
   .setAction(async function (args: any, hre: HardhatRuntimeEnvironment) {
     const clearType: string = args.clearType;
     console.log("clearType:", clearType);
-    const db = getDbInstance(args.firebaseConfig);
+    const db = getDbInstance();
     if (clearType === 'l1') {
       console.log("clear l1 deploy data...");
       await db.deleteL1(args.l1ChainId);
