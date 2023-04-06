@@ -3,10 +3,10 @@ eth beijing hackathon demo
 
 ### Introduction
 
-1. 我们是做一个Rollup As a Service 平台。简单来说，这个平台支持零代码创建一个zkevm rollup 并且所需时间是在分钟级别。为什么做这样一个平台？
-首先，以太坊官方也比较倾向于通过多个layer2 来解决主网拥堵，费用高问题。
-然后最近 Layer 2 和 app chain 相关项目非常火热，（Scroll， Taiko， Polygon zkEVM, Arbitrum 都是比较火的layer 2 项目）.
-同时 Coinbase/ dydx 也相继推出自己的layer2 
-所以我们相信在未来会有跟多制定化rollup 需求。 
+G1G2是一个ZK-Rollup As a Service 平台。G1G2具有一下优点：
 
-但是目前开发Rollup需要非常多的domain knowledge，从0到1做一个成本也比较高。我们想如果有一个平台可以非常快速且低成本搭建一个`即插即用`rollup， 不管是用来测试还是用来当作product都是非常方便的。
+  1. 安全。我们采用零知识证明技术来验证Layer2交易正确性，让我们的 L1 finality 完全基于数学，而不依赖于任何博弈论。
+  2. 去中心化。G1G2所有模块都是完全去中心化，这让Rollup具有抗审查能力。
+  3. 低门槛。所以操作都在平台完成，不需要联系工程师，也不需要写代码就可以创建一个高度制定化ZK-Rollup。
+  4. 快速。整个创建过程会在分钟级别完成，减少您的等待时间。
+  5. 成本低。通过我们高效的Rollup协议， 只需要花费几美元就可以创建一个Rollup，如此低成本情况下让您有更多选择。
