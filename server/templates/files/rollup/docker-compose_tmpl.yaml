@@ -1,0 +1,110 @@
+version: '3.9'
+
+services:
+  relay-db:
+    image: postgres
+    restart: always
+    container_name: g1g2_relay_db
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U postgres"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+    environment:
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - relay-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  init-db:
+    image: g1g2/g1g2-diesel:2023-02-06
+    depends_on:
+      relay-db:
+        condition: service_healthy
+    container_name: init-db
+    command:
+      - diesel
+      - --database-url
+      - postgres://postgres:admin@relay-db:5432/relay-db
+      - setup
+
+  l2db:
+    image: postgres
+    restart: always
+    container_name: l2_postgres
+    environment:
+        POSTGRES_PASSWORD: 'postgres'
+        POSTGRES_USER: 'postgres'
+        POSTGRES_HOST_AUTH_METHOD: 'trust'
+    volumes:
+      - l2_postgres_data:/var/lib/postgresql/data
+
+  l2blockscout:
+    depends_on:
+      - l2db
+    image: blockscout/blockscout:4.1.8
+    restart: always
+    container_name: l2_blockscout
+    command: bash -c "bin/blockscout eval \"Elixir.Explorer.ReleaseTasks.create_and_migrate()\" && bin/blockscout start"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    environment:
+        PORT: '4000'
+        ETHEREUM_JSONRPC_VARIANT: 'geth'
+        ETHEREUM_JSONRPC_HTTP_URL: http://l2_node:8545
+        ETHEREUM_JSONRPC_WS_URL: ws://l2_node:11546
+        DATABASE_URL: postgresql://postgres:postgres@l2db:5432/blockscout?ssl=false
+        NETWORK: g1g2
+        SUBNETWORK: 'g1g2 L2 Testnet'
+        COIN: ETH
+        ECTO_USE_SSL: 'false'
+        DISABLE_KNOWN_TOKENS: 'false'
+        SHOW_TESTNET_LABEL: 'true'
+        TESTNET_LABEL_TEXT: G1G2-LAB-DEV-L2
+        LOGO: /images/g1g2.svg
+        LOGO_FOOTER: /images/g1g2.svg
+        SUPPORTED_CHAINS: '[]'
+        DISPLAY_TOKEN_ICONS: 'true'
+    ports:
+      - 4002:4000
+
+  l2_node:
+    build:
+      context: l2_geth
+      dockerfile: ./Dockerfile
+    container_name: "{{.ChainName}}_node"
+    volumes:
+      - data:/data
+    ports:
+      - {{.L2HttpPort}}:8545
+      - {{.L2WsPort}}:8546
+      - {{.L2AuthRpcPort}}:8551
+
+  consensus:
+    build:
+      context: consensus
+      dockerfile: ./Dockerfile
+    container_name: "{{.ChainName}}_consensus"
+    depends_on:
+      init-db:
+        condition: service_completed_successfully
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+        L2_JWT_SECRET: /data/{{.ChainName}}/l2_geth/geth/jwtsecret
+    volumes:
+      - data:/data
+    command:
+      - --enable-propose
+      - --enable-prove
+      - --enable-relay
+      - --enable-sync
+
+volumes:
+  l2_postgres_data:
+    name: l2_postgres_data
+  relay-data:
+    name: relay-db-data
+  data:
+    name: {{.ChainName}}_node_data

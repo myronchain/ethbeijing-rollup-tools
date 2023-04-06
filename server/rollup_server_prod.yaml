@@ -1,0 +1,10 @@
+docker_image:
+  execution_base: 1.0.6-g1g2
+  consensus_base: 1.0.7-g1g2
+
+g1g2_admin:
+  l1_admin_pk: "dc4cf1bba6e4f415e5da84faa4d9981120f8cd1c8a5c956480aeae369325a59f"
+  rollup_admin_l2_premint_wei: 1000000000000000000000
+
+node:
+  base_port: 11545
