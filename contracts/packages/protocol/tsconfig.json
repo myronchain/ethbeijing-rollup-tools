@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "rootDir": ".",
+    "outDir": "./out",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "./src",
+    "./scripts",
+    "./tasks",
+    "./test",
+    "./typechain-types/**/*",
+    "./hardhat.config.ts",
+    ".eslintrc.js"
+  ],
+  "exclude": [
+  ]
+}

@@ -1,0 +1,26 @@
+node_modules
+coverage
+coverage.json
+typechain
+typechain-types
+
+#Hardhat/Foundry files
+cache
+artifacts
+
+# OpenZeppelin
+.openzeppelin/unknown-*.json
+.openzeppelin/goerli.json
+
+#abis
+abi
+
+docs
+
+# template
+src/config.ts
+
+.env
+
+deployments
+
