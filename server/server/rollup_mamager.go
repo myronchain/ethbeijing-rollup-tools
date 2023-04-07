@@ -75,7 +75,7 @@ func (m *Manager) runTxJobs(rollup *types.Rollup) error {
 				time.Sleep(time.Second * 2)
 				util.ExecWrapper(
 					fmt.Sprintf("cast send %s --value=10 --private-key=%s --rpc-url=%s --legacy", address.String(), pk, rollup.RpcUrl),
-				)
+				).Stdout()
 			}
 		}
 	}()
