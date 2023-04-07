@@ -53,9 +53,9 @@ export const StyledButton = styled(Button)<StylishProps>`
     }
     return `
         font-size: 1.5rem;
-        padding: 0.8rem 2.8rem;
+        padding: 1.8rem 1.8rem;
         margin: 0.8rem;
-        height: 4.0rem;
+        height: 3.0rem;
       `
   }};
   ${({ disabled }: any) => {

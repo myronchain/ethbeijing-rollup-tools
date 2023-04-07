@@ -50,14 +50,11 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
   },
   label: {
-    fontSize: '2rem',
+    fontSize: '1.5rem',
     display: 'flex',
     fontWeight: 'bold',
     alignItems: 'center',
     color: theme.palette.text.primary,
-    // position: 'absolute',
-    // bottom: '-0.2rem',
-    // right: '0',
     opacity: '0.5',
   },
   walletPill: {
@@ -199,10 +196,8 @@ const Header = (props: HeaderProps) => {
     <AppBar position="relative" className={styles.appbar}>
       <Box className={styles.root} display="flex" alignItems="center">
         <Box display="flex" flexDirection="row" flex={1} justifyContent="flex-start">
-          {/* <SvgImg size={36} color={theme.palette.primary.main} component={G1G2Logo} /> */}
-          {/*<Icon src={"/g1g2.svg"} width={36} color={theme.palette.primary.main} />*/}
           <span className={styles.label}>
-            <Typography variant="body2">{props.l2?.name.toUpperCase()}</Typography>
+            {props.l2?.name.toUpperCase()}
           </span>
         </Box>
 

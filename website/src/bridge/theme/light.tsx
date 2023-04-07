@@ -202,6 +202,9 @@ export const overridesLight = {
         color: palette.text.primary,
       },
     },
+    wrapper: {
+
+    }
   },
   MuiTooltip: {
     tooltip: {

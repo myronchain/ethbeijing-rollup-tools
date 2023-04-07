@@ -2,6 +2,7 @@ import React, { ChangeEvent } from 'react'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 import Network from '@/bridge/models/Network'
+import { Theme, makeStyles } from '@material-ui/core/styles'
 
 type HeaderProps = {
   deposit: boolean
@@ -10,17 +11,17 @@ type HeaderProps = {
   onChange?: (value: string) => void;
 }
 
-const HeaderTabs = (props: HeaderProps): JSX.Element => {
-  const handleChange = (event: ChangeEvent<{}>, newValue: string) => {
-    if (newValue === "l1explorer") {
-      window.open(props.l1?.explorerUrl, "_blank");
-      return;
-    }
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    fontSize: "1.5rem",
+    fontWeight: 900,
+  },
+}))
 
-    if (newValue === "l2explorer") {
-      window.open(props.l2?.explorerUrl, "_blank");
-      return;
-    }
+const HeaderTabs = (props: HeaderProps): JSX.Element => {
+  const styles = useStyles()
+
+  const handleChange = (event: ChangeEvent<{}>, newValue: string) => {
     event.preventDefault();
     !!props.onChange && props.onChange(newValue)
   };
@@ -28,10 +29,8 @@ const HeaderTabs = (props: HeaderProps): JSX.Element => {
   const value = props.deposit ? "deposit" : "withdraw"
   return (
     <Tabs value={value} onChange={handleChange}>
-      <Tab label="Deposit" value="deposit" />
-      <Tab label="Withdraw" value="withdraw" />
-      {/*<Tab label="L1Explorer" value="l1explorer" />*/}
-      {/*<Tab label="L2Explorer" value="l2explorer" />*/}
+      <Tab className={styles.root} label="Deposit" value="deposit" />
+      <Tab className={styles.root} label="Withdraw" value="withdraw" />
     </Tabs>
   );
 };
