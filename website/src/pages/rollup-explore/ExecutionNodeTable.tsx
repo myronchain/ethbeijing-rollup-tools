@@ -51,7 +51,6 @@ const ExecutionNodeTable = (props: {rollup?: Rollup}) => {
                     <Typography sx={{fontWeight: 500, fontSize: '0.875rem !important'}}>
                       {props.rollup?.name}
                     </Typography>
-                    {/* <Typography variant='caption'>{row.designation}</Typography> */}
                   </Box>
                 </TableCell>
                 <TableCell>{props.rollup?.chain_id}</TableCell>
