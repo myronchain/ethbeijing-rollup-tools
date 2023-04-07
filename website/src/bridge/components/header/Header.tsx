@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { makeStyles, Theme } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
 import { useApp } from '@/bridge/contexts/AppContext'
@@ -182,9 +181,7 @@ const Header = (props: HeaderProps) => {
 
   useInterval(updateDisplayBalance, 5000);
 
-  // const showBalance = !!displayBalance && !!connectedNetwork;
   const showBalance = !!connectedNetwork;
-  const ThemeModeIcon = isDarkMode ? "/images/bridge/sun-icon.svg" : "/images/bridge/moon-icon.svg";
 
   const rightButton = (
     <Flex alignCenter justifyCenter mx={1} fontSize={[".8rem", "1rem"]}>
