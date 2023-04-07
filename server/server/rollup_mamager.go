@@ -42,7 +42,7 @@ func (m *Manager) CreateRollup(req *types.CreateRollupRequest) error {
 	if err != nil {
 		return err
 	}
-	// err = m.runTxJobs(rollup)
+	err = m.runTxJobs(rollup)
 	return err
 }
 
@@ -61,10 +61,11 @@ func (m *Manager) runTxJobs(rollup *types.Rollup) error {
 		quit <- true
 	}
 	pk := m.cfg.G1G2Admin.L1AdminPK
-	address, err := util.PrivateKeyToAddress(pk)
-	if err != nil {
-		return err
-	}
+	newPk, newAdd := util.CreateAccount()
+	util.ExecWrapper(
+		fmt.Sprintf("cast send %s --value=10000000000000000 --private-key=%s --rpc-url=%s --legacy", newAdd, pk, rollup.RpcUrl),
+	).Stdout()
+
 	quit = make(chan bool)
 	go func() {
 		for {
@@ -74,7 +75,7 @@ func (m *Manager) runTxJobs(rollup *types.Rollup) error {
 			default:
 				time.Sleep(time.Second * 2)
 				util.ExecWrapper(
-					fmt.Sprintf("cast send %s --value=10 --private-key=%s --rpc-url=%s --legacy", address.String(), pk, rollup.RpcUrl),
+					fmt.Sprintf("cast send %s --value=1 --private-key=%s --rpc-url=%s --legacy", newAdd, newPk, rollup.RpcUrl),
 				).Stdout()
 			}
 		}

@@ -7,7 +7,7 @@ export class L1Net {
 }
 
 export const LocalL1: L1Net = {
-  name: "G1G2DockerDev",
+  name: "G1G2Net",
   chain_id: 10400,
   public_rpc: "http://127.0.0.1:10545",
   publick_ws: "ws://127.0.0.1:10546",
