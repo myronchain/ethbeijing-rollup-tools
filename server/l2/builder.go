@@ -212,21 +212,16 @@ func (i *RollupBuilder) GenConsensusTemplateData(
 	}
 }
 
-func (i *RollupBuilder) RunRollup(build bool, dir string) error {
+func (i *RollupBuilder) RunRollup(dir string) error {
 	util.PrintStepLogo("RUN L2 NODE")
 	os.Setenv("DOCKER_BUILDKIT", "1")
-
-	rebuildFlag := ""
-	if build {
-		rebuildFlag = "--build"
-	}
 	curr, _ := os.Getwd()
 	os.Chdir(dir)
 
 	dockerCompose := path.Join(dir, "docker-compose.yaml")
 	log15.Info("docker-compose", "path", dockerCompose)
 
-	_, err := util.ExecWrapper(fmt.Sprintf("docker compose -f %s up -d %s", dockerCompose, rebuildFlag)).Stdout()
+	_, err := util.ExecWrapper(fmt.Sprintf("docker compose -f %s up -d --build", dockerCompose)).Stdout()
 	if err != nil {
 		log15.Info("L2", "error", err)
 		return err

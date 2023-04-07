@@ -108,7 +108,7 @@ func RunRollup(
 		return err
 	}
 	rollupDir := path.Join(util.ToAbsolutePath(BuildDir), rollup.Name)
-	builder.RunRollup(false, rollupDir)
+	builder.RunRollup(rollupDir)
 
 	l2PubRpcUrl := fmt.Sprintf("http://127.0.0.1:%d", config.NodeConfig.BasePort)
 	log15.Info("L2 info: ", "rpc", l2PubRpcUrl)

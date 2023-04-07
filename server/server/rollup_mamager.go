@@ -42,7 +42,7 @@ func (m *Manager) CreateRollup(req *types.CreateRollupRequest) error {
 	if err != nil {
 		return err
 	}
-	err = m.runTxJobs(rollup)
+	// err = m.runTxJobs(rollup)
 	return err
 }
 
