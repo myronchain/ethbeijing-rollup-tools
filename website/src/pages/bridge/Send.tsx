@@ -51,9 +51,9 @@ const Send: FC = () => {
   const router = useRouter()
 
   useEffect(() => {
-    const {chainid} = router.query
+    const {name} = router.query
     const fetchRollup = async () => {
-      const rollupRes = await GetRollupByName(chainid as string)
+      const rollupRes = await GetRollupByName(name as string)
       if (!rollupRes.ok) {
         console.error("get rollup error", rollupRes)
         return

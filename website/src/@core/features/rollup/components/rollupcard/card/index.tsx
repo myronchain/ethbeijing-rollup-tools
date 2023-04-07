@@ -157,7 +157,7 @@ const RollupCard = (props: RollupCardProps) => {
               </a>
             </Typography>
             <Typography component='li' sx={{fontWeight: 600, color: 'text.primary'}}>
-              <a target={'_blank'} href={`/bridge/${props.rollup.chain_id}`} rel="noreferrer">Rollup
+              <a target={'_blank'} href={`/bridge/${props.rollup.name}`} rel="noreferrer">Rollup
                 Bridge</a>
             </Typography>
           </Typography>
