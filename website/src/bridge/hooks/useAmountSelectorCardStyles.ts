@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 export const useAmountSelectorCardStyles = makeStyles(theme => ({
   root: {
-    maxWidth: '51.6rem',
+    maxWidth: '45rem',
     boxSizing: 'border-box',
     [theme.breakpoints.down('xs')]: {
       width: '100%',
@@ -11,7 +11,7 @@ export const useAmountSelectorCardStyles = makeStyles(theme => ({
     transition: 'all 0.15s ease-out',
   },
   topRow: {
-    marginBottom: '1.8rem',
+    marginBottom: '1rem',
   },
   networkSelectionBox: {
     display: 'flex',
@@ -28,12 +28,12 @@ export const useAmountSelectorCardStyles = makeStyles(theme => ({
   networkIconContainer: {
     display: 'flex',
     justifyContent: 'center',
-    width: '4rem',
-    height: '4rem',
+    width: '2rem',
+    height: '2rem',
   },
   networkIcon: {
     display: 'flex',
-    height: '2.2rem',
+    height: '1.5rem',
     margin: '0.7rem',
   },
   balance: {

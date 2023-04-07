@@ -12,6 +12,7 @@ export const useSendStyles = makeStyles(theme => ({
   },
   sendLabel: {
     marginRight: '1.8rem',
+    fontSize: "1.5rem"
   },
   downArrow: {
     margin: '0.8rem',
@@ -57,7 +58,7 @@ export const useSendStyles = makeStyles(theme => ({
     marginTop: '2.4rem',
   },
   detailsDropdown: {
-    width: '51.6rem',
+    width: '45rem',
     marginTop: '2rem',
     '&[open] summary span::before': {
       content: '"▾"',
@@ -71,7 +72,7 @@ export const useSendStyles = makeStyles(theme => ({
     display: 'block',
     textAlign: 'right',
     fontWeight: 'normal',
-    paddingRight: '4rem',
+    paddingRight: '3rem',
     '&::marker': {
       display: 'none',
     },
@@ -94,7 +95,7 @@ export const useSendStyles = makeStyles(theme => ({
     },
   },
   customRecipient: {
-    width: '51.6rem',
+    width: '45rem',
     marginTop: '1rem',
     boxSizing: 'border-box',
     borderRadius: '3rem',

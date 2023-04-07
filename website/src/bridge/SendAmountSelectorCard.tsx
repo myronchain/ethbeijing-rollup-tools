@@ -82,12 +82,12 @@ const SendAmountSelectorCard: FC<Props> = props => {
 
   return (
     <Card className={styles.root}>
-      <Flex fullWidth justifyBetween alignCenter mb={'1.8rem'}>
+      <Flex fullWidth justifyBetween alignCenter mb={'0.8rem'}>
         <Typography variant="subtitle2" color="textSecondary">
           {label}
         </Typography>
         {loadingBalance ? (
-          <Skeleton variant="text" width="15.0rem"></Skeleton>
+          <Skeleton variant="text" width="10.0rem"></Skeleton>
         ) : balance ? (
           <div className={styles.balance}>
             {balance.gt(0) && !disableInput ? (
