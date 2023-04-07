@@ -22,6 +22,7 @@ var (
 		Subcommands: []*ffcli.Command{
 			rollupCommand,
 			genesisCommand,
+			genTxsCommand,
 		},
 	}
 )

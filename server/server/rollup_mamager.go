@@ -2,13 +2,10 @@ package server
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"github.com/g1g2-lab/automation/l2"
 	"github.com/g1g2-lab/automation/pkg/db"
 	"github.com/g1g2-lab/automation/types"
-	"github.com/g1g2-lab/automation/util"
 )
 
 type Manager struct {
@@ -42,51 +39,12 @@ func (m *Manager) CreateRollup(req *types.CreateRollupRequest) error {
 	if err != nil {
 		return err
 	}
-	err = m.runTxJobs(rollup)
 	return err
 }
 
 func (m *Manager) DeleteRollup(
 	name string,
 ) error {
-	m.stopTxJobs(name)
 	err := l2.StopRollupByName(context.Background(), m.cfg, name, m.Db())
 	return err
-}
-
-func (m *Manager) runTxJobs(rollup *types.Rollup) error {
-	quit, ok := m.jobs[rollup.Name]
-	if ok {
-		// already have a channel. stop it
-		quit <- true
-	}
-	pk := m.cfg.G1G2Admin.L1AdminPK
-	newPk, newAdd := util.CreateAccount()
-	util.ExecWrapper(
-		fmt.Sprintf("cast send %s --value=10000000000000000 --private-key=%s --rpc-url=%s --legacy", newAdd, pk, rollup.RpcUrl),
-	).Stdout()
-
-	quit = make(chan bool)
-	go func() {
-		for {
-			select {
-			case <-quit:
-				return
-			default:
-				time.Sleep(time.Second * 2)
-				util.ExecWrapper(
-					fmt.Sprintf("cast send %s --value=1 --private-key=%s --rpc-url=%s --legacy", newAdd, newPk, rollup.RpcUrl),
-				).Stdout()
-			}
-		}
-	}()
-	m.jobs[rollup.Name] = quit
-	return nil
-}
-
-func (m *Manager) stopTxJobs(name string) {
-	quit, ok := m.jobs[name]
-	if ok {
-		quit <- true
-	}
 }
