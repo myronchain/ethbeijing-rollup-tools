@@ -24,7 +24,7 @@ const pages = [
   },
   {
     key: 'start',
-    labelText: 'start build',
+    labelText: 'start buidl',
     url: '/rollup'
   }
 ];
